@@ -1,0 +1,484 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Time de Tráfego IA · Área do aluno</title>
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:84px}
+body{margin:0;background:#0A0A0B;color:#F4F4F5;font-family:Inter,system-ui,sans-serif;font-size:17px;line-height:1.65;-webkit-font-smoothing:antialiased}
+a{color:#FF5A4A}
+h1,h2,h3,.sg{font-family:'Space Grotesk',Inter,sans-serif}
+.wrap{max-width:860px;margin:0 auto;padding:0 20px}
+.muted{color:#A1A1AA}
+.soft{color:#C4C4CC}
+strong{color:#F4F4F5}
+
+/* topo */
+.top{position:sticky;top:0;z-index:20;background:rgba(10,10,11,.92);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid #1F1F23}
+.top .in{max-width:860px;margin:0 auto;padding:12px 20px;display:flex;align-items:center;gap:14px}
+.top img{width:34px;height:34px;border-radius:50%;object-fit:cover}
+.top .t{font-weight:700;font-size:15px;line-height:1.2}
+.top .s{font-size:12px;color:#A1A1AA}
+.prog{flex:1;display:flex;flex-direction:column;gap:5px;align-items:flex-end;min-width:110px}
+.prog .bar{width:100%;max-width:200px;height:6px;background:#26262A;border-radius:99px;overflow:hidden}
+.prog .bar i{display:block;height:100%;width:0;background:#DC2E22;border-radius:99px;transition:width .3s}
+.prog span{font-size:12px;color:#A1A1AA;font-weight:600}
+
+/* hero */
+.hero{padding:56px 0 32px}
+.pill{display:inline-block;border:1px solid #3A1714;background:#1A0D0C;color:#FF5A4A;font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;padding:7px 14px;border-radius:999px}
+.hero h1{margin:18px 0 14px;font-size:clamp(34px,6vw,54px);line-height:1.04;letter-spacing:-.03em}
+.hero h1 em{font-style:normal;color:#FF5A4A}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-top:28px}
+.stat{background:#141416;border:1px solid #26262A;border-radius:16px;padding:16px;text-align:center}
+.stat b{display:block;font-family:'Space Grotesk';font-size:34px;color:#FF5A4A;line-height:1}
+.stat span{display:block;margin-top:6px;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#A1A1AA}
+
+/* mapa */
+.map{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:10px;margin:28px 0 8px}
+.map a{display:flex;gap:12px;align-items:center;text-decoration:none;color:#F4F4F5;background:#141416;border:1px solid #26262A;border-radius:14px;padding:14px 16px;min-height:56px;transition:border-color .15s}
+.map a:hover{border-color:#52525B}
+.map .n{flex:0 0 auto;width:30px;height:30px;border-radius:9px;background:#1F0F0D;color:#FF5A4A;font-weight:700;font-size:13px;display:inline-flex;align-items:center;justify-content:center}
+.map a.done .n{background:#DC2E22;color:#fff}
+.map .tx{font-weight:600;font-size:15px;line-height:1.3}
+.map .tx small{display:block;font-weight:400;color:#A1A1AA;font-size:13px}
+
+/* seções */
+section{padding:56px 0;border-top:1px solid #1F1F23}
+.tag{display:inline-block;color:#FF5A4A;font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;margin-bottom:10px}
+section h2{margin:0 0 12px;font-size:clamp(28px,4.4vw,40px);line-height:1.08;letter-spacing:-.02em}
+section h3{margin:32px 0 10px;font-size:21px;letter-spacing:-.01em}
+.lead{font-size:18px;color:#C4C4CC;margin:0 0 20px}
+.time{display:inline-flex;align-items:center;gap:6px;font-size:13px;color:#A1A1AA;background:#141416;border:1px solid #26262A;border-radius:99px;padding:4px 12px;margin-bottom:16px}
+
+/* passos */
+.steps{list-style:none;padding:0;margin:18px 0;display:flex;flex-direction:column;gap:0;counter-reset:s}
+.steps li{position:relative;padding:14px 0 14px 50px;border-bottom:1px solid #1F1F23;counter-increment:s}
+.steps li:last-child{border-bottom:0}
+.steps li::before{content:counter(s);position:absolute;left:0;top:13px;width:32px;height:32px;border-radius:9px;border:1px solid #26262A;background:#141416;color:#FF5A4A;font-weight:700;font-size:14px;display:flex;align-items:center;justify-content:center}
+code{font-family:'JetBrains Mono',ui-monospace,monospace;font-size:.88em;background:#17171A;border:1px solid #26262A;border-radius:6px;padding:2px 6px;color:#F4F4F5;word-break:break-all}
+
+/* caixas */
+.box{border-radius:16px;padding:18px 20px;margin:18px 0;font-size:16px}
+.box .bt{font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;margin-bottom:6px}
+.tip{background:#18140A;border:1px solid #3B2F10}
+.tip .bt{color:#FBBF24}
+.warn{background:#1A0D0C;border:1px solid #3A1714}
+.warn .bt{color:#FF5A4A}
+.note{background:#101114;border:1px solid #26262A}
+.note .bt{color:#A1A1AA}
+
+/* lista check */
+.ul{list-style:none;padding:0;margin:14px 0;display:flex;flex-direction:column;gap:10px}
+.ul li{display:flex;gap:12px}
+.ul li::before{content:"";flex:0 0 auto;width:20px;height:20px;margin-top:4px;background:no-repeat center/20px url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23FF5A4A' stroke-width='2.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12l5 5L20 7'/%3E%3C/svg%3E")}
+
+/* bloco de código copiável */
+.code{background:#0F1012;border:1px solid #26262A;border-radius:16px;overflow:hidden;margin:16px 0}
+.code .h{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 12px 10px 18px;border-bottom:1px solid #26262A;background:#141416}
+.code .h span{font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#A1A1AA}
+.code pre{margin:0;padding:18px;font-family:'JetBrains Mono',ui-monospace,monospace;font-size:13.5px;line-height:1.7;white-space:pre-wrap;word-break:break-word;color:#E4E4E7;max-height:520px;overflow:auto}
+.copy{flex:0 0 auto;background:#DC2E22;color:#fff;border:0;border-radius:10px;font:inherit;font-weight:700;font-size:14px;padding:9px 16px;min-height:40px;cursor:pointer;transition:background .15s}
+.copy:hover{background:#B8241A}
+.copy.ok{background:#16A34A}
+
+/* abas */
+.tabs{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0 6px}
+.tab{min-height:44px;padding:9px 16px;border-radius:999px;font:inherit;font-weight:600;font-size:14px;cursor:pointer;background:#141416;color:#D4D4D8;border:1px solid #26262A}
+.tab:hover{border-color:#52525B}
+.tab.on{background:#F4F4F5;color:#0A0A0B;border-color:#F4F4F5}
+.pane{display:none}.pane.on{display:block}
+
+/* checklist */
+.chk{display:flex;align-items:flex-start;gap:14px;width:100%;padding:14px 16px;border-radius:14px;font:inherit;font-size:16px;line-height:1.45;cursor:pointer;background:#141416;border:1px solid #26262A;color:#D4D4D8;text-align:left;margin-bottom:8px}
+.chk .bx{flex:0 0 auto;width:24px;height:24px;margin-top:1px;border-radius:7px;display:inline-flex;align-items:center;justify-content:center;border:1.5px solid #52525B;color:transparent}
+.chk small{display:block;color:#A1A1AA;font-size:14px;margin-top:3px}
+.chk.on{background:#1A0D0C;border-color:#3A1714;color:#F4F4F5}
+.chk.on .bx{background:#DC2E22;border-color:#DC2E22;color:#fff}
+.meter{display:flex;align-items:center;gap:16px;background:#141416;border:1px solid #26262A;border-radius:16px;padding:16px 18px;margin:18px 0}
+.meter b{font-family:'Space Grotesk';font-size:38px;color:#FF5A4A;line-height:1}
+.meter .bar{flex:1;height:8px;background:#26262A;border-radius:99px;overflow:hidden}
+.meter .bar i{display:block;height:100%;width:0;background:#DC2E22;border-radius:99px;transition:width .2s}
+.meter .m{font-size:14px;color:#A1A1AA}
+
+/* acordeão */
+.acc{border:1px solid #26262A;border-radius:14px;overflow:hidden;margin-bottom:8px}
+.acc>button{width:100%;background:#141416;color:#F4F4F5;border:0;padding:16px 18px;display:flex;justify-content:space-between;align-items:center;gap:14px;font:inherit;font-weight:600;font-size:16px;text-align:left;cursor:pointer;min-height:54px}
+.acc>button:hover{background:#1A1A1D}
+.acc>button i{font-style:normal;color:#FF5A4A;font-size:22px;flex:0 0 auto}
+.acc .b{display:none;padding:2px 18px 16px;background:#141416;color:#C4C4CC;font-size:15.5px}
+.acc.open .b{display:block}
+.acc.open>button i{transform:rotate(45deg)}
+
+/* funções */
+.roles{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:10px;margin:18px 0}
+.role{background:#141416;border:1px solid #26262A;border-radius:14px;padding:16px}
+.role b{font-family:'Space Grotesk';font-size:17px}
+.role p{margin:4px 0 0;font-size:14.5px;color:#A1A1AA;line-height:1.5}
+
+/* gerador */
+.gen{background:#141416;border:1px solid #26262A;border-radius:18px;padding:20px;margin:18px 0}
+.gen .g{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+.gen label{display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:600;color:#A1A1AA}
+.gen input,.gen select{font:inherit;font-size:15px;background:#0F1012;color:#F4F4F5;border:1px solid #333338;border-radius:10px;padding:11px 12px;min-height:44px;width:100%}
+.gen input:focus,.gen select:focus{outline:2px solid #DC2E22;outline-offset:1px;border-color:transparent}
+.out{margin-top:16px;display:flex;flex-direction:column;gap:10px}
+.out .o{background:#0F1012;border:1px solid #26262A;border-radius:12px;padding:12px 14px;display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+.out .o div{min-width:0;flex:1}
+.out .o small{display:block;font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#A1A1AA}
+.out .o code{background:none;border:0;padding:0;font-size:13.5px;word-break:break-all}
+
+/* tabela */
+.tbl{width:100%;border-collapse:collapse;margin:16px 0;font-size:15px}
+.tbl th,.tbl td{text-align:left;padding:12px 10px;border-bottom:1px solid #26262A;vertical-align:top}
+.tbl th{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:#A1A1AA}
+.tblw{overflow-x:auto}
+
+/* concluir */
+.done-btn{display:inline-flex;align-items:center;gap:10px;margin-top:28px;background:transparent;color:#F4F4F5;border:1px solid #333338;border-radius:12px;font:inherit;font-weight:600;font-size:15px;padding:12px 18px;min-height:48px;cursor:pointer}
+.done-btn:hover{border-color:#52525B}
+.done-btn.on{background:#DC2E22;border-color:#DC2E22;color:#fff}
+
+/* final */
+.end{background:#DC2E22;border-radius:24px;padding:40px 24px;text-align:center;margin:20px 0 60px}
+.end h2{margin:0 0 10px;font-size:clamp(28px,4.4vw,40px);line-height:1.05}
+.end p{margin:0 auto 22px;max-width:520px}
+.end a{display:inline-flex;align-items:center;min-height:52px;background:#0A0A0B;color:#fff;text-decoration:none;font-weight:700;padding:14px 26px;border-radius:14px}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(120px);background:#F4F4F5;color:#0A0A0B;font-weight:700;font-size:15px;padding:12px 20px;border-radius:12px;transition:transform .25s;z-index:50}
+.toast.show{transform:translateX(-50%) translateY(0)}
+</style>
+</head>
+<body>
+
+<div class="top"><div class="in">
+<img src="data:image/jpeg;base64,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" alt="João Paulo">
+<div><div class="t">Time de Tráfego IA</div><div class="s">@jotapeolvr</div></div>
+<div class="prog"><div class="bar"><i id="pbar"></i></div><span id="ptxt">0 de 8 etapas</span></div>
+</div></div>
+
+<div class="wrap">
+
+<!-- HERO -->
+<div class="hero">
+<span class="pill">Área do aluno</span>
+<h1>Bem-vindo ao teu <em>Time de Tráfego IA.</em></h1>
+<p class="lead">Aqui está tudo que eu uso pra colocar o Claude pra montar campanha no Meta Ads: conexão, travas, o prompt do time, briefings prontos, checklist e os prompts de análise. Segue na ordem e em menos de uma hora tua primeira campanha está em rascunho, esperando teu ok.</p>
+<div class="box tip"><div class="bt">Como usar esta página</div>Cada etapa tem um botão <strong>"Marcar como concluída"</strong> no final. Teu progresso fica salvo neste navegador, então pode fechar e voltar depois. Tudo que é pra copiar tem um botão <strong>Copiar</strong>.</div>
+<div class="stats">
+<div class="stat"><b>9</b><span>Funções no time</span></div>
+<div class="stat"><b>5</b><span>Briefings por nicho</span></div>
+<div class="stat"><b>10</b><span>Itens no checklist</span></div>
+<div class="stat"><b>11</b><span>Prompts extras</span></div>
+</div>
+<div class="map" id="map"></div>
+</div>
+
+<!-- 0 ANTES -->
+<section id="s0" data-step="0">
+<span class="tag">Etapa 0 · Antes de tudo</span>
+<h2>Confere o que você precisa ter em mãos</h2>
+<span class="time">5 minutos</span>
+<p class="lead">Se um desses itens faltar, a IA trava no meio. Resolve antes e o resto flui.</p>
+<ul class="ul">
+<li><span><strong>Claude num plano pago</strong> (Pro ou acima) em claude.ai, no computador. É no computador que você adiciona o conector.</span></li>
+<li><span><strong>Conta de anúncios ativa</strong>, com forma de pagamento e você como <strong>administrador</strong> dela no Business.</span></li>
+<li><span><strong>Página do Facebook e Instagram ligados</strong> na conta de anúncios. Sem o Instagram ligado, o anúncio não roda com o teu perfil.</span></li>
+<li><span><strong>Pixel (conjunto de dados)</strong> recebendo o evento que importa pro teu objetivo: Purchase, Lead, Contact…</span></li>
+<li><span><strong>Criativos já na biblioteca</strong> do Gerenciador, com nomes fáceis (ex: <code>video-depoimento-01</code>).</span></li>
+</ul>
+<div class="box note"><div class="bt">Vai usar no plano Team ou Enterprise?</div>Nesses planos o conector precisa ser adicionado primeiro pelo <strong>dono da organização</strong> do Claude, nas configurações da organização. Depois disso cada pessoa conecta a própria conta.</div>
+<button class="done-btn" data-done="0">Marcar como concluída</button>
+</section>
+
+<!-- 1 CONECTAR -->
+<section id="s1" data-step="1">
+<span class="tag">Etapa 1 · Conexão</span>
+<h2>Liga o Claude no Meta Ads</h2>
+<span class="time">10 minutos</span>
+<p class="lead">Desde abril de 2026 a Meta tem um conector oficial pra IA trabalhar no Gerenciador. Com ele o Claude lê relatório e cria campanha, conjunto e anúncio direto pela API, sem clicar em tela nenhuma.</p>
+<ol class="steps">
+<li>No <strong>claude.ai</strong> (no computador), abre <strong>Configurações → Conectores</strong>.</li>
+<li>Procura <strong>Meta Ads</strong>. Se não aparecer na lista, clica em <strong>Adicionar conector personalizado</strong>, dá o nome <code>Meta Ads</code> e cola o endereço <code>https://mcp.facebook.com/ads</code>.</li>
+<li>Clica em <strong>Conectar</strong>. Abre o login do Facebook: entra com o perfil que é <strong>administrador</strong> da conta de anúncios.</li>
+<li>Na tela de permissões, escolhe o <strong>portfólio empresarial</strong> certo e autoriza.</li>
+<li>Abre um chat novo e testa com o comando abaixo.</li>
+</ol>
+<div class="code"><div class="h"><span>Teste de conexão</span><button class="copy">Copiar</button></div><pre>Lista todas as minhas contas de anúncio que você consegue acessar pelo conector da Meta. Pra cada uma, me diz: nome, ID, moeda, status e se você consegue criar campanha nela. Não cria nem altera nada.</pre></div>
+<h3>Deu problema? Resolve aqui</h3>
+<div class="acc"><button>"Meta Ads" não aparece na lista de conectores<i>+</i></button><div class="b">Normal. Usa o caminho do conector personalizado: <strong>Adicionar conector personalizado</strong> → nome <code>Meta Ads</code> → URL <code>https://mcp.facebook.com/ads</code>. Copia o endereço inteiro, com o <code>https://</code>.</div></div>
+<div class="acc"><button>Conectou, mas minha conta não aparece liberada<i>+</i></button><div class="b">O recurso está em beta e a Meta libera <strong>aos poucos</strong>, conta por conta. O que fazer:<br><br>1. Testa com outra conta de anúncios ou outro portfólio em que você é administrador.<br>2. Procura na Central de Ajuda para Empresas da Meta por <strong>"Meta Ads AI Connectors"</strong> pra conferir se tua conta já está elegível.<br>3. Espera alguns dias e testa de novo.<br>4. <strong>Enquanto isso, não fica parado:</strong> usa o time no <strong>Modo Plano</strong> (no fim desta etapa). A IA monta o plano, a copy e a UTM, e você só sobe no Gerenciador. Já corta a maior parte do trabalho.</div></div>
+<div class="acc"><button>Erro de permissão ou "conta não encontrada"<i>+</i></button><div class="b">Quase sempre é perfil errado. Confere se o Facebook que você usou no login é <strong>administrador</strong> da conta no Business (Configurações do negócio → Contas → Contas de anúncios). Depois desconecta e conecta de novo no Claude, escolhendo o portfólio certo na tela de permissões.</div></div>
+<div class="acc"><button>Uso Claude no plano Team ou Enterprise e não consigo adicionar<i>+</i></button><div class="b">Nesses planos só o <strong>dono da organização</strong> adiciona conector personalizado. Pede pra ele colocar <code>https://mcp.facebook.com/ads</code> nas configurações de conectores da organização. Depois você conecta tua conta normalmente.</div></div>
+<div class="acc"><button>Vi no vídeo a IA clicando na tela. É isso?<i>+</i></button><div class="b">Aquilo é o <strong>Claude in Chrome</strong>, a extensão do Claude pro navegador: ele abre o Gerenciador e clica como uma pessoa. Funciona, mas é mais lento e é um navegador por vez. No dia a dia use o conector. A extensão fica pro que o conector ainda não faz.</div></div>
+<div class="box tip"><div class="bt">Modo Plano · pra quem ainda não foi liberado</div>Cola o prompt do time (etapa 3) normalmente e acrescenta no fim do briefing: <strong>"Não tenho o conector ainda. Me entrega o plano, os nomes, as UTMs e as copys prontos pra eu subir na mão."</strong> Você ganha o trabalho de pensar e escrever. Só o clique fica contigo.</div>
+<button class="done-btn" data-done="1">Marcar como concluída</button>
+</section>
+
+<!-- 2 TRAVAS -->
+<section id="s2" data-step="2">
+<span class="tag">Etapa 2 · Segurança</span>
+<h2>Coloca as travas antes de soltar a IA</h2>
+<span class="time">10 minutos</span>
+<p class="lead">IA mexendo em conta com cartão cadastrado pede cinto de segurança. São três camadas: na Meta, na conta e no prompt.</p>
+<h3>Camada 1 · O que a IA pode acessar</h3>
+<ol class="steps">
+<li>No <strong>Business</strong>, abre <strong>Configurações do negócio → Integrações</strong> e procura a parte dos conectores de IA / Ads MCP Server.</li>
+<li>Escolhe <strong>só as contas de anúncio e páginas</strong> que a IA pode usar. Conta de cliente que você não quer arriscar, deixa de fora.</li>
+<li>Onde existir a opção, define o que é <strong>permitido ou bloqueado</strong> (criar, editar, mudar orçamento) e um <strong>teto de orçamento</strong>.</li>
+</ol>
+<div class="box note"><div class="bt">Se não achar essa tela</div>Como é beta, o nome e o lugar do menu mudam de conta pra conta. Se não aparecer pra você, a Camada 2 e a 3 já te protegem.</div>
+<h3>Camada 2 · Limite de gastos da conta</h3>
+<p class="soft">No Gerenciador, em <strong>Configurações de pagamento</strong>, define um <strong>limite de gastos da conta</strong>. É um teto total: bateu nele, a Meta para de veicular, aconteça o que acontecer. Põe um valor um pouco acima do que você pretende gastar no mês e ajusta quando precisar.</p>
+<h3>Camada 3 · Regras dentro do prompt</h3>
+<ul class="ul">
+<li><span>Tudo nasce <strong>pausado</strong>. Nada vai pro ar até você escrever <strong>PUBLICAR</strong>.</span></li>
+<li><span>Antes de criar, ela te mostra o <strong>plano numa tabela</strong> e espera teu "ok".</span></li>
+<li><span>Campanha que já está rodando: ela <strong>não mexe sem te mostrar antes</strong> o que vai mudar. Editar pelo conector pode reiniciar o aprendizado ou pausar a campanha.</span></li>
+<li><span>Se faltar informação, <strong>ela pergunta</strong>. Não inventa público, pixel, link nem número.</span></li>
+</ul>
+<p class="soft">Essas regras já estão no prompt da etapa 3. Você não precisa escrever nada.</p>
+<div class="box warn"><div class="bt">Nunca faça isso</div>Não cola senha, número de cartão, token de acesso nem código de verificação no chat. O conector usa o login oficial do Facebook e não precisa de nada disso.</div>
+<button class="done-btn" data-done="2">Marcar como concluída</button>
+</section>
+
+<!-- 3 PROMPT -->
+<section id="s3" data-step="3">
+<span class="tag">Etapa 3 · O time</span>
+<h2>Cola as instruções do time de 9 funções</h2>
+<span class="time">5 minutos</span>
+<p class="lead">Cria um <strong>Projeto</strong> no Claude chamado <strong>"Time de Tráfego"</strong> e cola o texto abaixo nas <strong>instruções do projeto</strong>. Pronto: todo chat aberto dentro desse projeto já nasce com o time montado.</p>
+<div class="roles" id="roles"></div>
+<div class="code"><div class="h"><span>Instruções do projeto</span><button class="copy">Copiar</button></div><pre>Você é meu time de tráfego no Meta Ads, conectado à minha conta pelo conector oficial da Meta. Trabalhe por funções, nesta ordem, e escreva o nome da função antes de cada parte da resposta:
+
+1. ESTRATEGISTA: a partir do briefing, define o objetivo (vendas, cadastros, mensagens ou tráfego) e a estrutura (quantas campanhas, conjuntos e anúncios). Explica o porquê em uma linha.
+2. ORÇAMENTO: orçamento diário na campanha (CBO), a não ser que eu peça por conjunto. Nunca passa do valor do briefing.
+3. PÚBLICO: usa a região e a idade do briefing, com público aberto (Advantage+). Só usa público salvo ou personalizado se eu passar o nome exato. Não pesquisa nem inventa interesse.
+4. CONVERSÃO: define pra onde o clique vai (site, WhatsApp ou formulário) e monta o link com UTM neste padrão: utm_source=meta&utm_medium=paid&utm_campaign={nome da campanha}&utm_content={nome do anúncio}
+5. PIXEL: confere o conjunto de dados (pixel) e escolhe o evento de otimização certo pro objetivo (Purchase, Lead, Contact…). Se o evento não estiver chegando, me avisa antes de seguir.
+6. COPY: escreve 3 textos principais e 3 títulos no meu tom, com gancho forte na primeira linha. Sem prometer resultado e sem nada que fira as políticas de anúncios da Meta.
+7. CRIATIVO: escolhe as mídias da biblioteca pelo nome que eu passar e diz qual vai em cada anúncio. Se faltar mídia, pede.
+8. QA: revisa nome, link, UTM, pixel, evento, orçamento, público, posicionamentos e a prévia de cada anúncio. Lista o que conferiu e qualquer ponto de atenção.
+9. ANALISTA: quando eu pedir análise de campanha que já rodou, puxa os números do período que eu disser (gasto, CPM, CTR, CPC, custo por resultado, frequência) e responde: o que pausar, o que manter, o que escalar e o que testar. Sempre com o número que justifica cada decisão.
+
+Regras que você nunca quebra:
+- Antes de criar qualquer coisa, me mostra o PLANO numa tabela (campanha, conjuntos, anúncios, orçamento, público, evento, link) e espera eu responder "ok".
+- Cria tudo PAUSADO. Nunca ativa nada sem eu escrever "PUBLICAR".
+- Nunca edita, pausa ou muda orçamento de campanha ativa sem antes me mostrar o que vai mudar e esperar meu "ok".
+- Padrão de nomes:
+  Campanha: [CBO][OBJETIVO] PRODUTO | PÚBLICO [DD.MM.AA]
+  Conjunto: PÚBLICO | REGIÃO | IDADE
+  Anúncio: AD01 | FORMATO | GANCHO
+- Se faltar informação, pergunta. Não inventa público, pixel, link nem número.
+- Responde em português, direto, sem enrolação.</pre></div>
+<div class="box tip"><div class="bt">Ajusta o tom em 30 segundos</div>Depois de colar, acrescenta uma linha no fim com o teu jeito de falar. Exemplo: <strong>"Meu tom: direto, próximo, chamo o cliente de 'você', sem emoji em excesso."</strong> Se tiver 2 ou 3 anúncios que já funcionaram, cola o texto deles também como referência.</div>
+<button class="done-btn" data-done="3">Marcar como concluída</button>
+</section>
+
+<!-- 4 BRIEFING -->
+<section id="s4" data-step="4">
+<span class="tag">Etapa 4 · Briefing</span>
+<h2>Manda o briefing do teu nicho</h2>
+<span class="time">5 minutos por campanha</span>
+<p class="lead">Toda campanha começa aqui. Escolhe a aba do teu tipo de negócio, copia, preenche o que está entre colchetes e manda num chat dentro do projeto.</p>
+<div class="tabs" id="btabs"></div>
+<div id="bpanes"></div>
+<div class="box note"><div class="bt">O que acontece depois</div>O Claude devolve o <strong>plano numa tabela</strong>. Você ajusta o que quiser ("troca o orçamento pra R$ 50", "tira o conjunto 2"), responde <strong>ok</strong> e ele cria tudo no Gerenciador, pausado.</div>
+
+<h3>Ferramenta · Gerador de nome e UTM</h3>
+<p class="soft">Preenche e copia. Serve pra conferir o que a IA montou ou pra subir no Modo Plano.</p>
+<div class="gen">
+<div class="g">
+<label>Tipo de orçamento<select id="gOrc"><option>CBO</option><option>ABO</option></select></label>
+<label>Objetivo<select id="gObj"><option>VENDAS</option><option>LEADS</option><option>MENSAGENS</option><option>TRAFEGO</option><option>REMARKETING</option></select></label>
+<label>Produto ou oferta<input id="gProd" placeholder="ex: Mentoria Agenda Cheia"></label>
+<label>Público<input id="gPub" placeholder="ex: Aberto 25-45"></label>
+<label>Nome do anúncio<input id="gAd" placeholder="ex: AD01 | VIDEO | DOR"></label>
+<label>Link de destino<input id="gUrl" placeholder="https://seusite.com/pagina"></label>
+</div>
+<div class="out">
+<div class="o"><div><small>Nome da campanha</small><code id="oName">—</code></div><button class="copy" data-from="oName">Copiar</button></div>
+<div class="o"><div><small>Link com UTM</small><code id="oUrl">—</code></div><button class="copy" data-from="oUrl">Copiar</button></div>
+</div>
+</div>
+<button class="done-btn" data-done="4">Marcar como concluída</button>
+</section>
+
+<!-- 5 CHECKLIST -->
+<section id="s5" data-step="5">
+<span class="tag">Etapa 5 · Checklist</span>
+<h2>Antes de ativar, confere essas 10 coisas</h2>
+<span class="time">5 minutos</span>
+<p class="lead">Abre o Gerenciador, acha a campanha pausada que a IA criou e vai marcando. Os 10 itens marcados querem dizer que pode publicar.</p>
+<div class="meter"><b id="cNum">0/10</b><div style="flex:1;display:flex;flex-direction:column;gap:6px"><div class="bar"><i id="cBar"></i></div><div class="m" id="cMsg">Clica em cada item conforme for conferindo.</div></div></div>
+<div id="checks"></div>
+<button class="done-btn" style="margin-top:8px" id="cReset" type="button">Limpar checklist pra próxima campanha</button>
+<button class="done-btn" data-done="5">Marcar como concluída</button>
+</section>
+
+<!-- 6 PUBLICAR -->
+<section id="s6" data-step="6">
+<span class="tag">Etapa 6 · Publicar</span>
+<h2>Confere e publica</h2>
+<span class="time">2 minutos</span>
+<ol class="steps">
+<li>Checklist com 10 de 10? Volta no chat do projeto.</li>
+<li>Escreve <strong>PUBLICAR</strong>. Ou, se preferir fazer você mesmo, ativa a campanha direto no Gerenciador.</li>
+<li>Pede a confirmação: <strong>"Me confirma o status de entrega da campanha, dos conjuntos e dos anúncios."</strong></li>
+<li>Deixa rodar. Não mexe nas primeiras 48 a 72 horas, a não ser que tenha erro claro (link quebrado, reprovação, gasto fora do esperado).</li>
+</ol>
+<h3>Onde a IA mais costuma errar</h3>
+<p class="soft">A primeira campanha você confere linha por linha. Da terceira em diante você já sabe onde ela erra e confere só isso. Esses são os pontos que mais pedem atenção:</p>
+<div class="tblw"><table class="tbl">
+<tr><th>Ponto</th><th>O que olhar</th></tr>
+<tr><td><strong>Evento do pixel</strong></td><td>Objetivo de vendas otimizando pra "Visualização de página" em vez de Purchase.</td></tr>
+<tr><td><strong>Link</strong></td><td>UTM duplicada, link sem <code>https://</code> ou apontando pra página antiga.</td></tr>
+<tr><td><strong>Público</strong></td><td>Região errada ("Brasil" quando era só tua cidade) ou idade diferente do briefing.</td></tr>
+<tr><td><strong>Criativo</strong></td><td>Vídeo vertical em posicionamento horizontal, ou mídia trocada entre anúncios.</td></tr>
+<tr><td><strong>Copy</strong></td><td>Promessa de resultado que a Meta reprova ("ganhe R$ 10 mil", "perca 10 kg").</td></tr>
+<tr><td><strong>Orçamento</strong></td><td>Valor por conjunto quando o combinado era na campanha, ou o contrário.</td></tr>
+</table></div>
+<button class="done-btn" data-done="6">Marcar como concluída</button>
+</section>
+
+<!-- 7 BONUS -->
+<section id="s7" data-step="7">
+<span class="tag">Etapa 7 · Bônus</span>
+<h2>5 prompts de análise + comandos rápidos</h2>
+<span class="time">Pra usar todo dia</span>
+<p class="lead">Aqui entra o <strong>Analista</strong>. Subir campanha é metade do jogo. A outra metade é saber o que fazer com os números. Cola no chat do projeto e troca o que está entre colchetes.</p>
+<div class="tabs" id="atabs"></div>
+<div id="apanes"></div>
+
+<h3>Rotina de 10 minutos</h3>
+<div class="tblw"><table class="tbl">
+<tr><th>Quando</th><th>Prompt</th><th>Pra quê</th></tr>
+<tr><td><strong>Todo dia</strong></td><td>Relatório do dia</td><td>Ver o que mudou e as 3 ações do dia</td></tr>
+<tr><td><strong>Quando o custo subir</strong></td><td>Custo alto</td><td>Achar a causa antes de mexer em tudo</td></tr>
+<tr><td><strong>Toda segunda</strong></td><td>Criativo cansado + Escala</td><td>Renovar o que cansou e crescer o que funciona</td></tr>
+<tr><td><strong>Toda sexta</strong></td><td>Resumo pro cliente</td><td>Mandar relatório em 1 minuto</td></tr>
+</table></div>
+
+<h3>Comandos rápidos</h3>
+<p class="soft">Os pedidos que eu mais uso no dia a dia. Todos respeitam as travas do prompt.</p>
+<div id="quick"></div>
+<button class="done-btn" data-done="7">Marcar como concluída</button>
+</section>
+
+<div class="end">
+<h2>Agora é colocar pra rodar.</h2>
+<p>Monta o projeto, manda o primeiro briefing e confere o rascunho. Travou em algum passo? Me chama que eu te ajudo.</p>
+<a href="https://wa.me/message/XM6YISXZBDAAC1" target="_blank" rel="noopener">Falar comigo no WhatsApp</a>
+<p style="margin:18px auto 0;font-size:14px;opacity:.9">ou no direct do <strong style="color:#fff">@jotapeolvr</strong></p>
+</div>
+</div>
+
+<div class="toast" id="toast">Copiado</div>
+
+<script>
+var KEY='tti-progresso-v1';
+var store={get:function(){try{return JSON.parse(localStorage.getItem(KEY))||{}}catch(e){return{}}},set:function(v){try{localStorage.setItem(KEY,JSON.stringify(v))}catch(e){}}};
+var S=store.get();S.done=S.done||{};S.checks=S.checks||{};
+function save(){store.set(S)}
+function $(id){return document.getElementById(id)}
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+
+/* mapa + progresso */
+var STEPS=[['Antes de tudo','O que ter em mãos'],['Liga o Claude no Meta Ads','Conexão oficial'],['Coloca as travas','Segurança em 3 camadas'],['Cola o time de 9 funções','Prompt do projeto'],['Manda o briefing','5 nichos + gerador de UTM'],['Checklist de 10 itens','Antes de ativar'],['Confere e publica','Onde a IA erra'],['Bônus de análise','5 prompts + comandos']];
+function renderMap(){
+$('map').innerHTML=STEPS.map(function(s,i){return '<a href="#s'+i+'" class="'+(S.done[i]?'done':'')+'"><span class="n">'+(S.done[i]?'✓':i)+'</span><span class="tx">'+s[0]+'<small>'+s[1]+'</small></span></a>'}).join('');
+var d=Object.keys(S.done).filter(function(k){return S.done[k]}).length;
+$('pbar').style.width=(d/8*100)+'%';$('ptxt').textContent=d+' de 8 etapas';
+document.querySelectorAll('[data-done]').forEach(function(b){var i=b.getAttribute('data-done');var on=!!S.done[i];b.classList.toggle('on',on);b.textContent=on?'✓ Etapa concluída':'Marcar como concluída';});
+}
+document.addEventListener('click',function(e){var b=e.target.closest('[data-done]');if(!b)return;var i=b.getAttribute('data-done');S.done[i]=!S.done[i];save();renderMap();});
+
+/* copiar */
+function toast(t){var el=$('toast');el.textContent=t;el.classList.add('show');clearTimeout(toast._t);toast._t=setTimeout(function(){el.classList.remove('show')},1600)}
+function doCopy(text,btn){
+function ok(){btn.classList.add('ok');btn.textContent='Copiado ✓';toast('Copiado');setTimeout(function(){btn.classList.remove('ok');btn.textContent='Copiar'},1800)}
+if(navigator.clipboard&&window.isSecureContext){navigator.clipboard.writeText(text).then(ok,function(){fallback()})}else fallback();
+function fallback(){var ta=document.createElement('textarea');ta.value=text;ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.select();try{document.execCommand('copy');ok()}catch(e){toast('Seleciona e copia manualmente')}document.body.removeChild(ta)}
+}
+document.addEventListener('click',function(e){var b=e.target.closest('.copy');if(!b)return;var from=b.getAttribute('data-from');var t;
+if(from){t=$(from).textContent}else{var pre=b.closest('.code').querySelector('pre');t=pre.textContent}
+if(t&&t!=='—')doCopy(t,b)});
+
+/* acordeão */
+document.addEventListener('click',function(e){var b=e.target.closest('.acc>button');if(!b)return;b.parentNode.classList.toggle('open')});
+
+/* funções */
+var ROLES=[['Estrategista','#FB7185','Objetivo e estrutura: campanha, conjuntos e anúncios.'],['Orçamento','#38BDF8','Quanto por dia e onde fica: campanha ou conjunto.'],['Público','#C084FC','Região, idade e público aberto ou os teus salvos.'],['Conversão','#F472B6','Pra onde o clique vai, com UTM.'],['Pixel','#F87171','Conjunto de dados e o evento certo.'],['Copy','#2DD4BF','3 textos e 3 títulos no teu tom.'],['Criativo','#A3E635','Qual mídia vai em cada anúncio.'],['QA','#F4F4F5','Revisa tudo antes de você ver.'],['Analista','#FBBF24','Lê os números e diz o que fazer.']];
+$('roles').innerHTML=ROLES.map(function(r,i){return '<div class="role"><b style="color:'+r[1]+'">'+(i+1)+'. '+r[0]+'</b><p>'+r[2]+'</p></div>'}).join('');
+
+/* abas genéricas */
+function tabs(tabsId,panesId,items){
+$(tabsId).innerHTML=items.map(function(it,i){return '<button type="button" class="tab'+(i?'':' on')+'" data-i="'+i+'">'+it.label+'</button>'}).join('');
+$(panesId).innerHTML=items.map(function(it,i){return '<div class="pane'+(i?'':' on')+'">'+(it.intro?'<p class="soft" style="margin:14px 0 0">'+it.intro+'</p>':'')+'<div class="code"><div class="h"><span>'+it.title+'</span><button class="copy">Copiar</button></div><pre>'+esc(it.text)+'</pre></div>'+(it.after||'')+'</div>'}).join('');
+$(tabsId).addEventListener('click',function(e){var b=e.target.closest('.tab');if(!b)return;var i=+b.getAttribute('data-i');
+$(tabsId).querySelectorAll('.tab').forEach(function(t,j){t.classList.toggle('on',i===j)});
+$(panesId).querySelectorAll('.pane').forEach(function(p,j){p.classList.toggle('on',i===j)});});
+}
+
+/* briefings */
+tabs('btabs','bpanes',[
+{label:'E-commerce',title:'Briefing · E-commerce',intro:'Pra loja virtual que quer venda direta. Otimiza pra compra.',text:
+'BRIEFING DA CAMPANHA · E-COMMERCE\n\nConta de anúncio: [nome ou ID]\nProduto ou coleção: [ex: Legging Compressão Preta]\nPreço e oferta: [ex: R$ 129, frete grátis acima de R$ 199]\nLink de destino: [página do produto ou da coleção]\nObjetivo: vendas\nPixel e evento: [nome do pixel] · Purchase\nOrçamento por dia: R$ [valor]\nRegião e idade: [ex: Brasil, 18-45] (ou "aberto")\nPúblico: aberto (Advantage+)\nCriativos (nome na biblioteca): [ex: video-produto-01, ugc-cliente-02, foto-flatlay-03]\nTextos: escreve no meu tom, focando em [benefício principal] e [prova: avaliações, número de vendidos, troca grátis]\nObservações: [ex: não falar de desconto, a marca é premium]'},
+{label:'Prestador de serviço',title:'Briefing · Prestador de serviço',intro:'Pra quem vende serviço e fecha no WhatsApp: clínica, advogado, arquiteto, instalador, consultor.',text:
+'BRIEFING DA CAMPANHA · PRESTADOR DE SERVIÇO\n\nConta de anúncio: [nome ou ID]\nServiço: [ex: impermeabilização de laje]\nOferta ou gancho: [ex: orçamento grátis em 24h]\nDestino: WhatsApp [número com DDD] com a mensagem pronta "[ex: Olá! Quero um orçamento]"\nObjetivo: mensagens\nOrçamento por dia: R$ [valor]\nRegião: [cidade ou raio em km de onde você atende]\nIdade: [ex: 30-60]\nPúblico: aberto (Advantage+)\nCriativos (nome na biblioteca): [ex: antes-depois-01, bastidor-equipe-02]\nTextos: escreve no meu tom, começando pela dor [ex: infiltração que volta toda chuva] e terminando com chamada pro orçamento\nObservações: [ex: não atendo fora de Manaus]'},
+{label:'Negócio local',title:'Briefing · Negócio local',intro:'Pra quem precisa que a pessoa vá até o endereço: restaurante, academia, salão, loja física.',text:
+'BRIEFING DA CAMPANHA · NEGÓCIO LOCAL\n\nConta de anúncio: [nome ou ID]\nNegócio: [ex: hamburgueria artesanal]\nEndereço: [rua, bairro, cidade]\nOferta: [ex: combo da semana R$ 39,90]\nDestino: [WhatsApp para pedido / perfil do Instagram / rota no mapa]\nObjetivo: [mensagens ou tráfego]\nOrçamento por dia: R$ [valor]\nRegião: raio de [X] km do endereço\nIdade: [do teu cliente real, ex: 18-40]\nPúblico: aberto (Advantage+)\nCriativos (nome na biblioteca): [ex: video-fachada-01, prato-close-02]\nTextos: escreve no meu tom com localização, horário de funcionamento e a oferta\nObservações: [ex: abrimos só à noite, das 18h às 23h]'},
+{label:'Infoproduto',title:'Briefing · Infoproduto',intro:'Pra curso, mentoria, e-book ou comunidade vendidos por página de vendas.',text:
+'BRIEFING DA CAMPANHA · INFOPRODUTO\n\nConta de anúncio: [nome ou ID]\nProduto: [nome do curso/mentoria/e-book]\nPreço: R$ [valor]\nPromessa (sem garantir resultado): [ex: aprender a montar campanha de tráfego do zero]\nLink de destino: [página de vendas]\nObjetivo: vendas\nPixel e evento: [nome do pixel] · Purchase (ou InitiateCheckout se ainda tiver poucas vendas)\nOrçamento por dia: R$ [valor]\nRegião e idade: [ex: Brasil, 22-45]\nPúblico: aberto (Advantage+) + [nome do público de engajamento do Instagram, se tiver]\nCriativos (nome na biblioteca): [ex: video-especialista-01, print-depoimento-02]\nTextos: escreve no meu tom, com gancho de dor ou curiosidade, sem prometer ganho financeiro\nObservações: [ex: carrinho fecha dia DD/MM]'},
+{label:'Remarketing',title:'Briefing · Remarketing',intro:'Pra quem já te conhece e ainda não comprou. Roda junto da campanha de aquisição, com verba menor.',text:
+'BRIEFING DA CAMPANHA · REMARKETING\n\nConta de anúncio: [nome ou ID]\nProduto ou oferta: [ex: mesmo produto da campanha principal]\nLink de destino: [página / checkout / WhatsApp]\nObjetivo: [vendas ou mensagens]\nPixel e evento: [nome do pixel] · [Purchase / Lead / Contact]\nOrçamento por dia: R$ [valor, normalmente 10% a 20% da aquisição]\nPúblicos (nome exato):\n- Incluir: [ex: Visitantes site 30D] e [ex: Engajou Instagram 60D]\n- Excluir: [ex: Compradores 180D]\nCriativos (nome na biblioteca): [ex: depoimento-01, objeção-preço-02]\nTextos: escreve no meu tom quebrando a objeção [ex: "é caro", "não tenho tempo"] e lembrando a oferta\nObservações: [ex: oferta acaba domingo]'}
+]);
+
+/* gerador */
+function slug(s){return s.trim().toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')}
+function gen(){
+var d=new Date(),dd=('0'+d.getDate()).slice(-2),mm=('0'+(d.getMonth()+1)).slice(-2),yy=String(d.getFullYear()).slice(-2);
+var prod=$('gProd').value.trim().toUpperCase(),pub=$('gPub').value.trim().toUpperCase(),ad=$('gAd').value.trim().toUpperCase();
+if(!prod){$('oName').textContent='—';$('oUrl').textContent='—';return}
+var name='['+$('gOrc').value+']['+$('gObj').value+'] '+prod+(pub?' | '+pub:'')+' ['+dd+'.'+mm+'.'+yy+']';
+$('oName').textContent=name;
+var u=$('gUrl').value.trim();
+if(!u){$('oUrl').textContent='— (cola o link de destino)';return}
+if(!/^https?:\/\//i.test(u))u='https://'+u;
+var p='utm_source=meta&utm_medium=paid&utm_campaign='+slug($('gObj').value+' '+prod+' '+pub)+(ad?'&utm_content='+slug(ad):'');
+$('oUrl').textContent=u+(u.indexOf('?')>-1?'&':'?')+p;
+}
+['gOrc','gObj','gProd','gPub','gAd','gUrl'].forEach(function(id){$(id).addEventListener('input',gen);$(id).addEventListener('change',gen)});
+
+/* checklist */
+var CHECKS=[['Nome no padrão','[CBO][OBJETIVO] PRODUTO | PÚBLICO [DD.MM.AA]'],['Objetivo certo','Vendas, cadastros, mensagens ou tráfego, como no briefing'],['Orçamento conferido','Valor diário e se está na campanha (CBO) ou no conjunto'],['Região e idade','Batendo com o briefing. Atenção a "Brasil" no lugar da tua cidade'],['Público','Aberto (Advantage+) ou o público salvo certo. Exclusões no remarketing'],['Posicionamentos','Automáticos, ou os escolhidos, combinando com o formato do criativo'],['Pixel e evento','Conjunto de dados certo e o evento de otimização do objetivo'],['Link com UTM','Abre a página certa, sem erro, com a UTM no final'],['Copy','Sem promessa de resultado, sem erro de português, com o teu tom'],['Prévia de cada anúncio','Feed, Stories e Reels. Mídia certa em cada anúncio, nada cortado']];
+function renderChecks(){
+var d=0;
+$('checks').innerHTML=CHECKS.map(function(c,i){var on=!!S.checks[i];if(on)d++;return '<button type="button" class="chk'+(on?' on':'')+'" data-c="'+i+'" aria-pressed="'+on+'"><span class="bx"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5L20 7"/></svg></span><span><strong>'+(i+1)+'. '+c[0]+'</strong><small>'+esc(c[1])+'</small></span></button>'}).join('');
+$('cNum').textContent=d+'/10';$('cBar').style.width=(d*10)+'%';
+$('cMsg').textContent=d===10?'Tudo certo. Pode escrever PUBLICAR.':(d===0?'Clica em cada item conforme for conferindo.':'Faltam '+(10-d)+' itens antes de ativar.');
+}
+$('checks').addEventListener('click',function(e){var b=e.target.closest('.chk');if(!b)return;var i=b.getAttribute('data-c');S.checks[i]=!S.checks[i];save();renderChecks();});
+$('cReset').addEventListener('click',function(){S.checks={};save();renderChecks();toast('Checklist limpo')});
+
+/* análise */
+tabs('atabs','apanes',[
+{label:'1. Relatório do dia',title:'Relatório do dia',text:'ANALISTA: puxa os números de ontem da conta [nome da conta], só das campanhas ativas: gasto, resultados, custo por resultado, CTR, CPM e frequência.\n\nCompara cada uma com a média dos últimos 7 dias e marca o que piorou mais de 20%.\n\nMe entrega numa tabela e termina com as 3 ações mais importantes de hoje, em ordem de prioridade. Não muda nada na conta.'},
+{label:'2. Custo alto',title:'Custo alto',text:'ANALISTA: a campanha [nome da campanha] está com custo por resultado de R$ [valor atual], e minha meta é R$ [meta].\n\nInvestiga nesta ordem e me mostra o número de cada etapa:\n1. Entrega: CPM e frequência subiram?\n2. Criativo: CTR caiu? Qual anúncio puxa o resultado pra baixo?\n3. Clique: CPC subiu?\n4. Página: muita gente clica e pouca converte?\n5. Pixel: o evento está chegando normal?\n\nMe diz a causa mais provável, com o número que comprova, e o primeiro teste que eu devo fazer. Não muda nada sem meu ok.'},
+{label:'3. Criativo cansado',title:'Criativo cansado',text:'ANALISTA: lista os anúncios ativos dos últimos 14 dias que estão com frequência acima de [2,5] ou com CTR mais de 30% abaixo da primeira semana.\n\nPra cada um, me diz por que parece cansado e sugere 3 ganchos novos no meu tom: um de dor, um de curiosidade e um de prova.\n\nDepois do meu ok, COPY e CRIATIVO montam os novos anúncios PAUSADOS dentro do mesmo conjunto, usando as mídias [nomes na biblioteca].'},
+{label:'4. Hora de escalar',title:'Hora de escalar',text:'ANALISTA: quais campanhas ou conjuntos ficaram com custo por resultado abaixo de R$ [meta] por pelo menos 3 dias seguidos, com pelo menos [X] resultados no período?\n\nPra cada um, propõe um jeito de escalar:\n- aumento de orçamento de no máximo 20% a 30% por vez, ou\n- duplicar o vencedor numa campanha nova.\n\nMe mostra o plano com o orçamento antes e depois, e espera meu ok. Nunca aumenta orçamento sozinho.'},
+{label:'5. Resumo pro cliente',title:'Resumo pro cliente',text:'ANALISTA: monta o resumo da semana ([data início] a [data fim]) da conta [nome] pro meu cliente [nome do cliente].\n\nInclui: quanto foi investido, quantos resultados, custo por resultado, comparação com a semana anterior, o que fizemos e os próximos passos.\n\nFormato de mensagem de WhatsApp, até 12 linhas, linguagem simples, sem jargão (nada de CPM e CTR). Tom profissional e próximo.'}
+]);
+
+/* comandos rápidos */
+var QUICK=[['Status rápido','Me lista as campanhas ativas da conta [nome] com o gasto de hoje, o status de entrega e se tem algum anúncio reprovado.'],['Duplicar vencedora','Duplica a campanha [nome] numa nova campanha PAUSADA trocando só os criativos pelas mídias [nomes na biblioteca]. Mantém público, pixel e orçamento. Plano antes.'],['Remarketing em 1 minuto','Cria uma campanha de remarketing pra campanha [nome]: incluir [público de visitantes], excluir [público de compradores], orçamento de R$ [valor] por dia. Plano antes.'],['Novas copys','COPY: reescreve os textos do anúncio [nome] em 3 versões: gancho de dor, de curiosidade e de prova. Me mostra antes de trocar qualquer coisa.'],['Conferir pixel','Confere se o pixel [nome] recebeu o evento [Purchase/Lead/Contact] nas últimas 24 horas e quantas vezes. Se não recebeu, me diz o que pode ser.'],['Fechamento do mês','Quanto gastei este mês na conta [nome], quantos resultados tive e qual campanha teve o menor custo por resultado? Em tabela.']];
+$('quick').innerHTML=QUICK.map(function(q){return '<div class="code"><div class="h"><span>'+q[0]+'</span><button class="copy">Copiar</button></div><pre>'+esc(q[1])+'</pre></div>'}).join('');
+
+renderMap();renderChecks();
+</script>
+</body>
+</html>
